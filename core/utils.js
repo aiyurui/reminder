@@ -112,18 +112,27 @@ async function getTotalWaterCount() {
   return Object.values(h).reduce((s, d) => s + (d.count || 0), 0);
 }
 
+function shiftDateKey(dateKey, deltaDays) {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  date.setDate(date.getDate() + deltaDays);
+  return localDateKey(date);
+}
+
 async function getConsecutiveDays() {
   const h = await getWaterHistory();
   const goal = (await getSettings()).waterGoal || 8;
-  const dates = Object.keys(h).sort().reverse();
-  let n = 0;
-  for (const d of dates) {
-    //
-    const waterOk = h[d] && h[d].count >= goal;
-    if (waterOk) n++;
-    else break;
+  let streak = 0;
+  let cursor = localDateKey();
+
+  for (let guard = 0; guard < 370; guard++) {
+    const waterOk = h[cursor] && h[cursor].count >= goal;
+    if (!waterOk) break;
+    streak++;
+    cursor = shiftDateKey(cursor, -1);
   }
-  return n;
+
+  return streak;
 }
 
 async function getWeeklyActiveDays() {
@@ -232,18 +241,19 @@ async function isWorkingDay(dateStr) {
 //
 async function getGazeStreakMin(min = 1) {
   const h = await getGazeHistory();
-  const dates = Object.keys(h).sort().reverse();
   let streak = 0;
-  for (const d of dates) {
-    const isWork = await isWorkingDay(d);
+
+  let cursor = localDateKey();
+  for (let guard = 0; guard < 370; guard++) {
+    const isWork = await isWorkingDay(cursor);
     if (isWork) {
-      if (h[d] >= min) {
+      if ((h[cursor] || 0) >= min) {
         streak++;
       } else {
         break;
       }
     }
-    //
+    cursor = shiftDateKey(cursor, -1);
   }
   return streak;
 }
@@ -268,15 +278,19 @@ async function getGazeStreakMinWeek(min = 1) {
 //
 async function getEscapeStreakMin(min = 1) {
   const h = await getEscapeHistory();
-  const dates = Object.keys(h).sort().reverse();
   let streak = 0;
-  for (const d of dates) {
-    const isWork = await isWorkingDay(d);
-    if (isWork && h[d] >= min) {
-      streak++;
-    } else if (isWork) {
-      break;
+
+  let cursor = localDateKey();
+  for (let guard = 0; guard < 370; guard++) {
+    const isWork = await isWorkingDay(cursor);
+    if (isWork) {
+      if ((h[cursor] || 0) >= min) {
+        streak++;
+      } else {
+        break;
+      }
     }
+    cursor = shiftDateKey(cursor, -1);
   }
   return streak;
 }
@@ -287,21 +301,21 @@ async function getAllRemindersStreak(minDays = 30) {
   const gaze = await getGazeHistory();
   const escape = await getEscapeHistory();
   const goal = (await getSettings()).waterGoal || 8;
-
-  const allDates = [...new Set([...Object.keys(water), ...Object.keys(gaze), ...Object.keys(escape)])].sort().reverse();
   let streak = 0;
 
-  for (const d of allDates) {
-    if (await isWorkingDay(d)) {
-      const waterOk = water[d] && water[d].count >= goal;
-      const gazeOk = gaze[d] && gaze[d] >= 1;
-      const escapeOk = escape[d] && escape[d] >= 1;
+  let cursor = localDateKey();
+  for (let guard = 0; guard < 370; guard++) {
+    if (await isWorkingDay(cursor)) {
+      const waterOk = water[cursor] && water[cursor].count >= goal;
+      const gazeOk = gaze[cursor] && gaze[cursor] >= 1;
+      const escapeOk = escape[cursor] && escape[cursor] >= 1;
       if (waterOk && gazeOk && escapeOk) {
         streak++;
       } else {
         break;
       }
     }
+    cursor = shiftDateKey(cursor, -1);
   }
   return streak;
 }

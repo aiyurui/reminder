@@ -34,24 +34,15 @@ function onWorkDayModeChange(e) {
   const customSection = document.getElementById('custom-weekdays');
   const info2026 = document.getElementById('workday2026-info');
 
-  if (e.target.value === 'custom') {
-    customSection.style.display = 'block';
-  } else {
-    customSection.style.display = 'none';
-  }
-
-  if (e.target.value === 'workday2026') {
-    info2026.style.display = 'block';
-  } else {
-    info2026.style.display = 'none';
-  }
+  customSection.hidden = e.target.value !== 'custom';
+  info2026.hidden = e.target.value !== 'workday2026';
 }
 
 function onReminderTypeChange(e) {
   const type = e.target.value;
-  document.getElementById('interval-config').style.display = type === 'interval' ? 'block' : 'none';
-  document.getElementById('fixed-config').style.display = type === 'fixed' ? 'block' : 'none';
-  document.getElementById('monthly-config').style.display = type === 'monthly' ? 'block' : 'none';
+  document.getElementById('interval-config').hidden = type !== 'interval';
+  document.getElementById('fixed-config').hidden = type !== 'fixed';
+  document.getElementById('monthly-config').hidden = type !== 'monthly';
 }
 
 function openAddModal() {
@@ -254,7 +245,10 @@ async function saveSettingsHandler() {
     if (reminderType === 'interval') {
       const intervalInput = document.getElementById(`${reminder.id}-interval`);
       if (intervalInput) {
-        reminder.interval = parseInt(intervalInput.value);
+        const parsedInterval = parseInt(intervalInput.value, 10);
+        reminder.interval = Number.isFinite(parsedInterval) && parsedInterval > 0
+          ? parsedInterval
+          : (reminder.interval || 30);
       }
     }
 
@@ -269,7 +263,12 @@ async function saveSettingsHandler() {
       const dayInput = document.getElementById(`${reminder.id}-day`);
       const timeInput = document.getElementById(`${reminder.id}-time`);
       if (dayInput) {
-        reminder.day = parseInt(dayInput.value);
+        const parsedDay = parseInt(dayInput.value, 10);
+        if (Number.isFinite(parsedDay)) {
+          reminder.day = Math.min(31, Math.max(1, parsedDay));
+        } else {
+          reminder.day = reminder.day || 15;
+        }
       }
       if (timeInput) {
         reminder.time = timeInput.value;

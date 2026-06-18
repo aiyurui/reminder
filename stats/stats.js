@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function getMonthKey(date) {
-  return date.toISOString().slice(0, 7);
+  return localDateKey(date).slice(0, 7);
 }
 
 async function renderStats() {

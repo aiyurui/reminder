@@ -25,7 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.tabs.create({ url: chrome.runtime.getURL('stats/stats.html') });
   });
 
-  setInterval(updateCurrentTime, 60000);
+  setInterval(() => {
+    updateCurrentTime();
+    updateWorkStatus();
+  }, 60000);
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'settings-updated') { loadQuickStats(); }
@@ -37,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (area === 'local' && changes.settings) {
       renderReminders();
       updateWaterProgress();
+      updateWorkStatus();
       loadQuickStats();
     }
   });
@@ -169,59 +173,146 @@ function inferType(reminder) {
 }
 
 function calculateNextTime(reminder, settings) {
-  const now = new Date();
+  const nowTs = Date.now();
   const type = inferType(reminder);
 
   if (type === 'interval') {
-    const minutes = reminder.unit === 'hour' ? reminder.interval * 60 : reminder.interval;
-    const intervalMs = minutes * 60000;
-
-    const wStart = (settings.workHours && settings.workHours.start) || '09:00';
-    const wEnd = (settings.workHours && settings.workHours.end) || '18:00';
-    const [sH, sM] = wStart.split(':').map(Number);
-    const [eH, eM] = wEnd.split(':').map(Number);
-
-    const dayStart = new Date(now);
-    dayStart.setHours(sH, sM, 0, 0);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setHours(eH, eM, 0, 0);
-
-    const elapsed = now.getTime() - dayStart.getTime();
-    const inWork = now.getTime() >= dayStart.getTime() && now.getTime() < dayEnd.getTime();
-    const nextDayStart = new Date(dayStart.getTime() + 86400000);
-    const anchor = dayStart.getTime();
-
-    let next;
-    if (elapsed < 0) {
-      next = anchor;
-    } else if (!inWork) {
-      next = nextDayStart.getTime() + intervalMs;
-    } else {
-      next = anchor + (Math.floor(elapsed / intervalMs) + 1) * intervalMs;
-    }
-    return next;
+    return getNextIntervalTriggerForDisplay(reminder, settings, nowTs);
   }
 
   if (type === 'fixed') {
-    const [h, m] = reminder.time.split(':').map(Number);
-    const target = new Date();
-    target.setHours(h, m, 0, 0);
-    if (target.getTime() <= now.getTime()) {
-      target.setDate(target.getDate() + 1);
-    }
-    return target.getTime();
+    return getNextFixedTriggerForDisplay(reminder, settings, nowTs);
   }
 
   if (type === 'monthly') {
-    const nowDate = new Date();
-    const target = new Date(nowDate.getFullYear(), nowDate.getMonth(), reminder.day);
-    const [h, m] = (reminder.time || '10:00').split(':').map(Number);
-    target.setHours(h, m, 0, 0);
-    if (target <= nowDate) {
-      target.setMonth(target.getMonth() + 1);
-    }
-    return target.getTime();
+    return getNextMonthlyTriggerForDisplay(reminder, nowTs);
   }
 
-  return now.getTime() + 3600000;
+  return nowTs + 3600000;
+}
+
+function isWorkdayForDateDisplay(date, settings) {
+  const mode = settings.workDayMode || 'weekday';
+  if (mode === 'daily') return true;
+  if (mode === 'weekday') return date.getDay() >= 1 && date.getDay() <= 5;
+  if (mode === 'workday2026') return isWorkingDay2026(date);
+  if (mode === 'custom') return (settings.workDays || []).includes(date.getDay());
+  return false;
+}
+
+function getNextIntervalTriggerForDisplay(reminder, settings, fromTs = Date.now()) {
+  const intervalMs = (reminder.unit === 'hour' ? reminder.interval * 60 : reminder.interval) * 60000;
+  const [sH, sM] = ((settings.workHours && settings.workHours.start) || '09:00').split(':').map(Number);
+  const [eH, eM] = ((settings.workHours && settings.workHours.end) || '18:00').split(':').map(Number);
+  const lunch = settings.lunchBreak || { enabled: false };
+
+  let cursor = new Date(fromTs + 1000);
+  for (let guard = 0; guard < 370; guard++) {
+    if (!isWorkdayForDateDisplay(cursor, settings)) {
+      cursor.setDate(cursor.getDate() + 1);
+      cursor.setHours(sH, sM, 0, 0);
+      continue;
+    }
+
+    const dayStart = new Date(cursor);
+    dayStart.setHours(sH, sM, 0, 0);
+    const dayEnd = new Date(cursor);
+    dayEnd.setHours(eH, eM, 0, 0);
+
+    if (cursor < dayStart) cursor = new Date(dayStart);
+    if (cursor >= dayEnd) {
+      cursor.setDate(cursor.getDate() + 1);
+      cursor.setHours(sH, sM, 0, 0);
+      continue;
+    }
+
+    const elapsed = Math.max(0, cursor.getTime() - dayStart.getTime());
+    let when = dayStart.getTime() + Math.ceil(elapsed / intervalMs) * intervalMs;
+    if (when <= fromTs) when += intervalMs;
+    if (when >= dayEnd.getTime()) {
+      cursor.setDate(cursor.getDate() + 1);
+      cursor.setHours(sH, sM, 0, 0);
+      continue;
+    }
+
+    if (lunch.enabled && lunch.start && lunch.end && reminder.id !== 'lunch') {
+      const [lS, lM] = lunch.start.split(':').map(Number);
+      const [lE, lE2] = lunch.end.split(':').map(Number);
+      const lunchStart = new Date(dayStart);
+      lunchStart.setHours(lS, lM, 0, 0);
+      const lunchEnd = new Date(dayStart);
+      lunchEnd.setHours(lE, lE2, 0, 0);
+      if (when >= lunchStart.getTime() && when < lunchEnd.getTime()) {
+        when = lunchEnd.getTime();
+      }
+    }
+
+    if (when > fromTs) return when;
+    cursor = new Date(when + intervalMs);
+  }
+
+  return fromTs + 3600000;
+}
+
+function getNextFixedTriggerForDisplay(reminder, settings, fromTs = Date.now()) {
+  if (!reminder || !reminder.time) return fromTs + 3600000;
+
+  const [hour, minute] = reminder.time.split(':').map(Number);
+  const lunch = settings.lunchBreak || { enabled: false };
+  let cursor = new Date(fromTs + 1000);
+
+  for (let guard = 0; guard < 370; guard++) {
+    if (!isWorkdayForDateDisplay(cursor, settings)) {
+      cursor.setDate(cursor.getDate() + 1);
+      cursor.setHours(0, 0, 0, 0);
+      continue;
+    }
+
+    const target = new Date(cursor);
+    target.setHours(hour, minute, 0, 0);
+    if (target.getTime() <= fromTs) {
+      cursor.setDate(cursor.getDate() + 1);
+      cursor.setHours(0, 0, 0, 0);
+      continue;
+    }
+
+    if (reminder.id !== 'lunch' && lunch.enabled && lunch.start && lunch.end) {
+      const [lS, lM] = lunch.start.split(':').map(Number);
+      const [lE, lE2] = lunch.end.split(':').map(Number);
+      const lunchStart = new Date(target);
+      lunchStart.setHours(lS, lM, 0, 0);
+      const lunchEnd = new Date(target);
+      lunchEnd.setHours(lE, lE2, 0, 0);
+      if (target >= lunchStart && target < lunchEnd) {
+        target.setHours(lE, lE2, 0, 0);
+      }
+    }
+
+    if (target.getTime() > fromTs) return target.getTime();
+    cursor.setDate(cursor.getDate() + 1);
+    cursor.setHours(0, 0, 0, 0);
+  }
+
+  return fromTs + 3600000;
+}
+
+function getNextMonthlyTriggerForDisplay(reminder, fromTs = Date.now()) {
+  const now = new Date(fromTs);
+  const targetDay = reminder.day || 15;
+  const [hour, minute] = (reminder.time || '10:00').split(':').map(Number);
+
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const lastDayThisMonth = new Date(year, month + 1, 0).getDate();
+  let target = new Date(year, month, Math.min(targetDay, lastDayThisMonth), hour, minute, 0, 0);
+
+  if (target.getTime() <= fromTs) {
+    const nextMonth = month + 1;
+    const nextYear = nextMonth > 11 ? year + 1 : year;
+    const nextMonthIndex = nextMonth > 11 ? 0 : nextMonth;
+    const lastDayNextMonth = new Date(nextYear, nextMonthIndex + 1, 0).getDate();
+    target = new Date(nextYear, nextMonthIndex, Math.min(targetDay, lastDayNextMonth), hour, minute, 0, 0);
+  }
+
+  return target.getTime();
 }

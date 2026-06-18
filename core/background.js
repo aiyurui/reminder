@@ -83,42 +83,12 @@ async function scheduleAlarms(settings) {
       await chrome.alarms.create(alarmName, { when });
       console.log(`[带薪养生] 注册 fixed 闹钟: ${alarmName}, 首次触发: ${target.toLocaleString()}`);
     } else if (type === 'monthly') {
-      const targetDay = reminder.day || 15;
-      const checkHour = reminder.time ? parseInt(reminder.time.split(':')[0], 10) : 10;
-      const checkMinute = reminder.time ? parseInt(reminder.time.split(':')[1], 10) : 0;
-
-      //
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const lastDayThisMonth = new Date(year, month + 1, 0).getDate();
-      let target = new Date(
-        year,
-        month,
-        Math.min(targetDay, lastDayThisMonth),
-        checkHour,
-        checkMinute,
-        0,
-        0
-      );
-      if (target.getTime() <= now.getTime()) {
-        const nextMonth = month + 1;
-        const nextYear = nextMonth > 11 ? year + 1 : year;
-        const nextMonthIndex = nextMonth > 11 ? 0 : nextMonth;
-        const lastDayNextMonth = new Date(nextYear, nextMonthIndex + 1, 0).getDate();
-        target = new Date(
-          nextYear,
-          nextMonthIndex,
-          Math.min(targetDay, lastDayNextMonth),
-          checkHour,
-          checkMinute,
-          0,
-          0
-        );
-      }
+      const when = getNextMonthlyTrigger(reminder, now.getTime());
+      const target = new Date(when);
       await chrome.alarms.create(alarmName, {
-        when: target.getTime()
+        when
       });
-      console.log(`[带薪养生] 注册 monthly 闹钟: ${alarmName}, 首次触发: ${target.toLocaleString()}, 每月${targetDay}日`);
+      console.log(`[带薪养生] 注册 monthly 闹钟: ${alarmName}, 首次触发: ${target.toLocaleString()}, 每月${reminder.day || 15}日`);
     }
   }
 
@@ -281,7 +251,7 @@ async function checkAchievements() {
     case 'activity_total':
       achievements[key].progress = await getGazeTotalCount();
       break;
-    case 'gaze_streak':
+    case 'gaze_streak_min':
       achievements[key].progress = await getGazeStreakMin(5);
       break;
     case 'gaze_today':
@@ -435,6 +405,44 @@ function getNextFixedTrigger(reminder, settings, fromTs = Date.now()) {
   return null;
 }
 
+function getNextMonthlyTrigger(reminder, fromTs = Date.now()) {
+  const now = new Date(fromTs);
+  const targetDay = reminder.day || 15;
+  const checkHour = reminder.time ? parseInt(reminder.time.split(':')[0], 10) : 10;
+  const checkMinute = reminder.time ? parseInt(reminder.time.split(':')[1], 10) : 0;
+
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const lastDayThisMonth = new Date(year, month + 1, 0).getDate();
+  let target = new Date(
+    year,
+    month,
+    Math.min(targetDay, lastDayThisMonth),
+    checkHour,
+    checkMinute,
+    0,
+    0
+  );
+
+  if (target.getTime() <= fromTs) {
+    const nextMonth = month + 1;
+    const nextYear = nextMonth > 11 ? year + 1 : year;
+    const nextMonthIndex = nextMonth > 11 ? 0 : nextMonth;
+    const lastDayNextMonth = new Date(nextYear, nextMonthIndex + 1, 0).getDate();
+    target = new Date(
+      nextYear,
+      nextMonthIndex,
+      Math.min(targetDay, lastDayNextMonth),
+      checkHour,
+      checkMinute,
+      0,
+      0
+    );
+  }
+
+  return target.getTime();
+}
+
 //
 chrome.notifications.onClicked.addListener((id) => {
   chrome.notifications.clear(id);
@@ -442,7 +450,9 @@ chrome.notifications.onClicked.addListener((id) => {
 
 chrome.notifications.onButtonClicked.addListener((id, btnIdx) => {
   chrome.notifications.clear(id);
-  if (id.includes('water')) {
+  const rid = reminderIdFromNotificationId(id);
+
+  if (rid === 'water') {
     if (btnIdx === 0) {
       recordReminderResponse('water')
         .then(() => addWaterCup())
@@ -450,7 +460,7 @@ chrome.notifications.onButtonClicked.addListener((id, btnIdx) => {
     }
     else if (btnIdx === 1) handleSnooze('water');
     else if (btnIdx === 2) handleSkipToday('water');
-  } else if (id.includes('gaze')) {
+  } else if (rid === 'gaze') {
     if (btnIdx === 0) {
       recordReminderResponse('gaze')
         .then(() => recordGazeResponse())
@@ -458,7 +468,7 @@ chrome.notifications.onButtonClicked.addListener((id, btnIdx) => {
     }
     else if (btnIdx === 1) handleSnooze('gaze');
     else if (btnIdx === 2) handleSkipToday('gaze');
-  } else if (id.includes('escape')) {
+  } else if (rid === 'escape') {
     if (btnIdx === 0) {
       recordReminderResponse('escape')
         .then(() => recordEscapeResponse())
@@ -467,11 +477,10 @@ chrome.notifications.onButtonClicked.addListener((id, btnIdx) => {
     else if (btnIdx === 1) handleSnooze('escape');
     else if (btnIdx === 2) handleSkipToday('escape');
   } else {
-    const rid = reminderIdFromNotificationId(id);
     if (btnIdx === 0 && rid) {
       recordReminderResponse(rid).then(() => checkAchievements());
-    } else if (btnIdx === 1) handleSnooze(rid);
-    else if (btnIdx === 2) handleSkipToday(rid);
+    } else if (btnIdx === 1 && rid) handleSnooze(rid);
+    else if (btnIdx === 2 && rid) handleSkipToday(rid);
   }
 });
 
@@ -540,6 +549,11 @@ async function isSkippedToday(reminderId) {
 
 //
 chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'moyu-daily-reset') {
+    getSettings().then(s => scheduleAlarms(s));
+    return;
+  }
+
   const isRegularAlarm = alarm.name.startsWith(ALARM_PREFIX);
   const isSnoozeAlarm = alarm.name.startsWith(SNOOZE_ALARM_PREFIX);
   if (isRegularAlarm || isSnoozeAlarm) {
@@ -590,6 +604,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           if (nextWhen) chrome.alarms.create(alarm.name, { when: nextWhen });
         } else if (!isSnoozeAlarm && type === 'fixed') {
           const nextWhen = getNextFixedTrigger(reminder, settings, Date.now());
+          if (nextWhen) chrome.alarms.create(alarm.name, { when: nextWhen });
+        } else if (!isSnoozeAlarm && type === 'monthly') {
+          const nextWhen = getNextMonthlyTrigger(reminder, Date.now());
           if (nextWhen) chrome.alarms.create(alarm.name, { when: nextWhen });
         }
       }
