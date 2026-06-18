@@ -1,0 +1,201 @@
+﻿:root {
+  --primary: #5B7BA3;
+  --primary-light: #7DA0C4;
+  --accent: #E8A838;
+  --bg: #F0F2F5;
+  --card-bg: #FFFFFF;
+  --text: #1A1D23;
+  --text-secondary: #6B7280;
+  --border-radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 360px;
+  min-height: 500px;
+  font-family: 'Microsoft YaHei UI', -apple-system, 'PingFang SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.header {
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary), #3D5A7F);
+  color: white;
+  text-align: center;
+}
+
+.header h1 { font-size: 20px; margin-bottom: 4px; display: inline-block; vertical-align: middle; }
+
+.header-icon {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  margin-right: 8px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.header p { font-size: 14px; opacity: 0.9; }
+
+.status {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 10px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.water-progress {
+  margin: 16px;
+  padding: 16px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+
+.progress-bar {
+  height: 8px;
+  background: #E0E0E0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.reminders-list { padding: 0 16px 16px; }
+
+.reminder-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+}
+
+.reminder-item:hover { transform: translateX(4px); }
+
+.reminder-emoji { font-size: 28px; margin-right: 12px; }
+
+.reminder-info { flex: 1; }
+
+.reminder-name { font-size: 14px; font-weight: 500; }
+
+.reminder-countdown {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.reminder-badge {
+  padding: 2px 8px;
+  background: var(--accent);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.footer { padding: 0 16px 16px; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--text-secondary);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.quick-stats {
+  margin: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+  font-size: 13px;
+  transition: transform 0.2s;
+}
+
+.stat-item:hover {
+  transform: translateX(4px);
+}
+
+.stat-item:active {
+  transform: scale(0.98);
+}
+
+.stat-main {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stat-link {
+  color: var(--primary);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.stat-link .arrow {
+  font-size: 11px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--text-secondary);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>带薪养生 - 提醒统计</title>
+  <link rel="stylesheet" href="logs.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📝 提醒统计</h1>
+
+    <div class="stat-section">
+      <div class="stat-header">🍵 喝水提醒</div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat-num" id="water-today">0</span>
+          <span class="stat-label">今日(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="water-week">0</span>
+          <span class="stat-label">本周(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="water-avg">0</span>
+          <span class="stat-label">日均(次)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-section">
+      <div class="stat-header">🚽 如厕提醒</div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat-num" id="escape-today">0</span>
+          <span class="stat-label">今日(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="escape-week">0</span>
+          <span class="stat-label">本周(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="escape-avg">0</span>
+          <span class="stat-label">日均(次)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-section">
+      <div class="stat-header">👀 远眺提醒</div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat-num" id="gaze-today">0</span>
+          <span class="stat-label">今日(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="gaze-week">0</span>
+          <span class="stat-label">本周(次)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="gaze-avg">0</span>
+          <span class="stat-label">日均(次)</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-back" id="btn-back">→ 返回</button>
+  </div>
+
+  <div class="container" style="margin-top: 14px;">
+    <button class="toggle-btn" id="btn-toggle-detail">
+      <span>近7日详情</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="detail-section" id="detail-section" style="display: none;">
+      <div id="detail-list"></div>
+    </div>
+  </div>
+
+  <script src="../core/utils.js"></script>
+  <script src="logs.js"></script>
+</body>
+</html>

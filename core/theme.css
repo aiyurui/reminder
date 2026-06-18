@@ -1,0 +1,98 @@
+:root {
+  --brand-700: #355a84;
+  --brand-600: #456b97;
+  --brand-500: #5b7ba3;
+  --brand-400: #7da0c4;
+  --accent-500: #e8a838;
+  --success-500: #10b981;
+  --danger-500: #e74c3c;
+  --bg: #eef3f8;
+  --bg-soft: #f8fbff;
+  --card-bg: #ffffff;
+  --text: #1a1d23;
+  --text-secondary: #5f6b7a;
+  --border: #d8e1ec;
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 10px;
+  --shadow-sm: 0 2px 8px rgba(22, 34, 51, 0.08);
+  --shadow-md: 0 10px 24px rgba(22, 34, 51, 0.12);
+  --transition-fast: 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Microsoft YaHei UI", -apple-system, "PingFang SC", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 8% -20%, rgba(125, 160, 196, 0.35), transparent 44%),
+    radial-gradient(circle at 110% 0%, rgba(232, 168, 56, 0.16), transparent 36%),
+    var(--bg);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+button {
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+a,
+button,
+input,
+select,
+[tabindex] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(69, 107, 151, 0.4);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,145 @@
+﻿@import url("../core/theme.css");
+
+body {
+  padding: 24px 18px;
+}
+
+.container {
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: var(--brand-700);
+}
+
+.stat-section,
+.detail-section,
+.toggle-btn {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-section {
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.stat-header {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-item:not(:last-child) {
+  border-right: 1px solid #edf2f8;
+}
+
+.stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-600);
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.btn-back {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-back:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.toggle-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  border-color: var(--brand-400);
+}
+
+.toggle-btn .arrow {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.detail-section {
+  padding: 10px 0;
+  margin-top: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid #edf2f8;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-date {
+  color: var(--text-secondary);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.detail-count {
+  font-weight: 700;
+  color: var(--brand-600);
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.detail-types {
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}

@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>带薪养生</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <img src="../icons/icon-128.png" alt="图标" class="header-icon">
+    <h1>带薪养生</h1>
+    <p id="current-time">--:--</p>
+    <span id="work-status" class="status">工作中</span>
+  </div>
+
+  <div class="water-progress">
+    <div class="progress-header">
+      <span>🍵 今日喝水</span>
+      <span id="water-count">0/8 杯</span>
+    </div>
+    <div class="progress-bar">
+      <div id="water-fill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="quick-stats">
+  <div class="stat-item" id="btn-weekly-stats">
+    <div class="stat-main">📊 <span id="weekly-stat-text">本周：0/7 天达标</span></div>
+    <span class="stat-link">查看详情 <span class="arrow">→</span></span>
+  </div>
+  <div class="stat-item" id="btn-achievements-row">
+    <div class="stat-main">🏆 <span id="achievement-stat-text">已解锁 0/15 成就</span></div>
+    <span class="stat-link">查看成就 <span class="arrow">→</span></span>
+  </div>
+  </div>
+
+  <div class="reminders-list" id="reminders-list">
+    <!-- 动态渲染 -->
+  </div>
+
+  <div class="footer">
+    <div class="btn-row">
+      <button id="btn-achievements" class="btn-icon">🏆 成就</button>
+      <button id="btn-stats" class="btn-icon">📊 统计</button>
+      <button id="btn-settings" class="btn-icon">⚙️ 设置</button>
+    </div>
+  </div>
+
+  <script src="../core/utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

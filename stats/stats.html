@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>带薪养生 - 统计</title>
+  <link rel="stylesheet" href="stats.css">
+</head>
+<body>
+<div class="container">
+  <h1>📊 统计数据</h1>
+
+  <div class="stat-section">
+    <div class="stat-header">🍵 喝水</div>
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num" id="water-today">0</span>
+        <span class="stat-label">今日(杯)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="water-month">0</span>
+        <span class="stat-label">本月(杯)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="water-avg">0</span>
+        <span class="stat-label">日均(杯)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-header">🚽 如厕</div>
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num" id="escape-today">0</span>
+        <span class="stat-label">今日(次)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="escape-month">0</span>
+        <span class="stat-label">本月(次)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="escape-avg">0</span>
+        <span class="stat-label">日均(次)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-section">
+    <div class="stat-header">👀 远眺</div>
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num" id="gaze-today">0</span>
+        <span class="stat-label">今日(次)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="gaze-month">0</span>
+        <span class="stat-label">本月(次)</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="gaze-avg">0</span>
+        <span class="stat-label">日均(次)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <div class="chart-header">
+      <span class="chart-title">📱 30天趋势</span>
+      <div class="chart-legend">
+        <span class="legend-item water">● 喝水</span>
+        <span class="legend-item escape">● 如厕</span>
+        <span class="legend-item gaze">● 远眺</span>
+      </div>
+    </div>
+    <div class="line-chart" id="line-chart"></div>
+  </div>
+
+  <button class="btn-back" id="btn-back">→ 返回</button>
+  <button class="detail-toggle" id="detail-toggle">近7日提醒详情 ▼</button>
+  <div class="detail-list" id="detail-list"></div>
+</div>
+<script src="../core/utils.js"></script>
+<script src="stats.js"></script>
+</body>
+</html>

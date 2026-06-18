@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>带薪养生 - 设置</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ 设置</h1>
+
+    <!-- 工作时段设置 -->
+    <div class="section">
+      <h2>🕐 工作模式</h2>
+
+      <div class="workday-mode-selector" id="workday-mode-selector">
+        <label>
+          <input type="radio" name="workday-mode" value="daily" id="mode-daily">
+          <span>📅 每天</span>
+        </label>
+        <label>
+          <input type="radio" name="workday-mode" value="weekday" id="mode-weekday" checked>
+          <span>📆 周一至周五</span>
+        </label>
+        <label>
+          <input type="radio" name="workday-mode" value="workday2026" id="mode-workday2026">
+          <span>🇨🇳 2026年工作日（自动排除法定节假日）</span>
+        </label>
+        <label>
+          <input type="radio" name="workday-mode" value="custom" id="mode-custom">
+          <span>✏️ 个性化勾选</span>
+        </label>
+      </div>
+
+      <div id="custom-weekdays" class="workday-custom" hidden>
+        <label class="hint-label">选择工作日：</label>
+        <div class="weekday-selector">
+          <label><input type="checkbox" value="1"> 周一</label>
+          <label><input type="checkbox" value="2"> 周二</label>
+          <label><input type="checkbox" value="3"> 周三</label>
+          <label><input type="checkbox" value="4"> 周四</label>
+          <label><input type="checkbox" value="5"> 周五</label>
+          <label><input type="checkbox" value="6"> 周六</label>
+          <label><input type="checkbox" value="0"> 周日</label>
+        </div>
+      </div>
+
+      <div id="workday2026-info" class="workday-2026-info" hidden>
+        ✅ 已预置 2026 年中国法定节假日安排，节假日不提醒，调休补班日照常提醒
+      </div>
+
+      <div class="time-range-row">
+        <div class="time-field">
+          <span class="time-label">上班</span>
+          <input type="time" id="work-start" value="09:00">
+        </div>
+        <span class="time-sep">~</span>
+        <div class="time-field">
+          <span class="time-label">下班</span>
+          <input type="time" id="work-end" value="18:00">
+        </div>
+      </div>
+
+      <div class="lunch-row">
+        <div class="lunch-toggle">
+          <span class="lunch-icon">🍜</span>
+          <span class="lunch-text">午休暂停提醒</span>
+          <label class="toggle">
+            <input type="checkbox" id="lunch-enabled" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="lunch-time-row" id="lunch-time-config">
+          <span class="time-sep" style="font-size:12px;color:#9CA3AF;">午休</span>
+          <div class="time-field">
+            <input type="time" id="lunch-start" value="11:30">
+          </div>
+          <span class="time-sep">~</span>
+          <div class="time-field">
+            <input type="time" id="lunch-end" value="13:00">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提醒设置 -->
+    <div class="section">
+      <div class="section-header">
+        <h2>🔔 提醒配置</h2>
+        <button id="btn-add-reminder" class="btn-small">添加提醒</button>
+      </div>
+      <div id="reminder-cards"></div>
+    </div>
+
+    <!-- 保存按钮 -->
+    <div class="actions">
+      <button id="btn-save" class="btn-primary">💾 保存设置</button>
+      <button id="btn-reset" class="btn-secondary">🔄 恢复默认</button>
+    </div>
+
+    <p id="status-msg" class="status-msg"></p>
+  </div>
+
+  <!-- 添加提醒弹窗 -->
+  <div id="add-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>➕ 添加新提醒</h3>
+        <button id="modal-close" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>图标</label>
+          <div class="emoji-picker" id="emoji-picker">
+            <span class="emoji-option active">📝</span>
+            <span class="emoji-option">💊</span>
+            <span class="emoji-option">☕</span>
+            <span class="emoji-option">🏃</span>
+            <span class="emoji-option">👀</span>
+            <span class="emoji-option">🌙</span>
+            <span class="emoji-option">📱</span>
+            <span class="emoji-option">💤</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>提醒名称</label>
+          <input type="text" id="new-reminder-title" placeholder="例如：吃药提醒" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label>提醒方式</label>
+          <select id="new-reminder-type">
+            <option value="interval">⏰ 间隔提醒</option>
+            <option value="fixed">📅 定时提醒</option>
+            <option value="monthly">🗓️ 每月提醒</option>
+          </select>
+        </div>
+        <div class="form-group" id="interval-config">
+          <label>间隔</label>
+          <div class="interval-input-row">
+            <input type="number" id="new-reminder-interval" value="30" min="1" max="999" class="config-input">
+            <select id="new-reminder-unit">
+              <option value="minute">分钟</option>
+              <option value="hour">小时</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" id="fixed-config" hidden>
+          <label>时间</label>
+          <input type="time" id="new-reminder-time" value="12:00">
+        </div>
+        <div class="form-group" id="monthly-config" hidden>
+          <label>日期</label>
+          <div class="interval-input-row">
+            <input type="number" id="new-reminder-day" value="15" min="1" max="31" class="config-input">
+            <span>日</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn-secondary">取消</button>
+        <button id="modal-confirm" class="btn-primary">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../core/utils.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
+

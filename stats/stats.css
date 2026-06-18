@@ -1,0 +1,194 @@
+﻿@import url("../core/theme.css");
+
+body {
+  padding: 24px 18px;
+}
+
+.container {
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: var(--brand-700);
+}
+
+.stat-section,
+.chart-section,
+.detail-list {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-section {
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.stat-header {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-item:not(:last-child) {
+  border-right: 1px solid #edf2f8;
+}
+
+.stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-600);
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.chart-section {
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chart-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-item.water {
+  color: var(--brand-600);
+}
+
+.legend-item.escape {
+  color: #ba7a09;
+}
+
+.legend-item.gaze {
+  color: var(--success-500);
+}
+
+.line-chart {
+  width: 100%;
+  min-height: 120px;
+}
+
+.line-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.btn-back,
+.detail-toggle {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-back {
+  margin-top: 20px;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-back:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.detail-toggle {
+  margin-top: 10px;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.detail-toggle:hover {
+  border-color: var(--brand-400);
+}
+
+.detail-list {
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.reminder-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #edf2f8;
+}
+
+.reminder-item:last-child {
+  border-bottom: none;
+}
+
+.reminder-date,
+.reminder-time,
+.reminder-emoji {
+  flex: 1;
+  text-align: center;
+}
+
+.reminder-date,
+.reminder-time {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.reminder-emoji {
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
