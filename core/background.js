@@ -56,21 +56,6 @@ async function scheduleAlarms(settings) {
     const alarmName = ALARM_PREFIX + reminder.id;
     const type = reminder.type || inferType(reminder);
 
-    //
-    const lunch = settings.lunchBreak || { enabled: false };
-    let lunchStartTime = null, lunchEndTime = null;
-    if (lunch.enabled && lunch.start && lunch.end) {
-      const [sH, sM] = (settings.workHours?.start || '09:00').split(':').map(Number);
-      const [lS, lM] = lunch.start.split(':').map(Number);
-      const [lE, lE2] = lunch.end.split(':').map(Number);
-      const dayStart = new Date(now);
-      dayStart.setHours(sH, sM, 0, 0);
-      lunchStartTime = new Date(dayStart);
-      lunchStartTime.setHours(lS, lM, 0, 0);
-      lunchEndTime = new Date(dayStart);
-      lunchEndTime.setHours(lE, lE2, 0, 0);
-    }
-
     if (type === 'interval') {
       const when = getNextIntervalTrigger(reminder, settings, now.getTime());
       if (!when) continue;
@@ -227,6 +212,9 @@ async function checkAchievements() {
     }
     if (achievements[key].unlocked) continue;
 
+    const prevProgress = achievements[key].progress;
+    const prevUnlocked = achievements[key].unlocked;
+
     switch (def.type) {
     //
     case 'consecutive':
@@ -291,11 +279,14 @@ async function checkAchievements() {
       break;
     }
 
-    if (achievements[key].progress >= achievements[key].target) {
+    if (achievements[key].progress >= achievements[key].target && !prevUnlocked) {
       achievements[key].unlocked = true;
       achievements[key].unlockedAt = new Date().toISOString();
     }
-    changed = true;
+
+    if (achievements[key].progress !== prevProgress || achievements[key].unlocked !== prevUnlocked) {
+      changed = true;
+    }
   }
 
   if (changed) await saveAchievements(achievements);
@@ -599,9 +590,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           message: messages[reminderId] || getRandomTip()
         }, { forceShow: isSnoozeAlarm });
 
-        if (!isSnoozeAlarm && type === 'interval') {
+        if (type === 'interval') {
           const nextWhen = getNextIntervalTrigger(reminder, settings, Date.now());
-          if (nextWhen) chrome.alarms.create(alarm.name, { when: nextWhen });
+          if (nextWhen) chrome.alarms.create(ALARM_PREFIX + reminderId, { when: nextWhen });
         } else if (!isSnoozeAlarm && type === 'fixed') {
           const nextWhen = getNextFixedTrigger(reminder, settings, Date.now());
           if (nextWhen) chrome.alarms.create(alarm.name, { when: nextWhen });

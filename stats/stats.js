@@ -27,14 +27,19 @@ async function renderStats() {
   const monthCups = Object.entries(waterHistory)
     .filter(([d]) => d.startsWith(thisMonth))
     .reduce((s, [, v]) => s + (v.count || 0), 0);
-  const monthDays = new Set(Object.keys(waterHistory).filter((d) => d.startsWith(thisMonth))).size;
+  const escapeHistory = await getEscapeHistory();
+  const gazeHistory = await getGazeHistory();
+  const monthDays = new Set([
+    ...Object.keys(waterHistory).filter((d) => d.startsWith(thisMonth)),
+    ...Object.keys(escapeHistory).filter((d) => d.startsWith(thisMonth)),
+    ...Object.keys(gazeHistory).filter((d) => d.startsWith(thisMonth))
+  ]).size;
   const waterAvg = monthDays > 0 ? (monthCups / monthDays).toFixed(1) : 0;
 
   document.getElementById('water-today').textContent = daily.count;
   document.getElementById('water-month').textContent = monthCups;
   document.getElementById('water-avg').textContent = waterAvg;
 
-  const escapeHistory = await getEscapeHistory();
   const todayEscape = escapeHistory[today] || 0;
   const monthEscape = Object.entries(escapeHistory)
     .filter(([d]) => d.startsWith(thisMonth))
@@ -45,7 +50,6 @@ async function renderStats() {
   document.getElementById('escape-month').textContent = monthEscape;
   document.getElementById('escape-avg').textContent = escapeAvg;
 
-  const gazeHistory = await getGazeHistory();
   const todayGaze = gazeHistory[today] || 0;
   const monthGaze = Object.entries(gazeHistory)
     .filter(([d]) => d.startsWith(thisMonth))

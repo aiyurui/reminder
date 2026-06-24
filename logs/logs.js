@@ -1,7 +1,10 @@
 ﻿const REMINDER_NAMES = {
   water: '🍵',
   escape: '🚽',
-  gaze: '👀'
+  gaze: '👀',
+  lunch: '🍜',
+  offwork: '🏠',
+  salary: '💰'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
