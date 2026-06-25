@@ -209,6 +209,7 @@ async function checkAchievements() {
   for (const [key, def] of Object.entries(ACHIEVEMENTS_DEF)) {
     if (!achievements[key]) {
       achievements[key] = { progress: 0, target: def.target, unlocked: false };
+      changed = true;
     }
     if (achievements[key].unlocked) continue;
 
